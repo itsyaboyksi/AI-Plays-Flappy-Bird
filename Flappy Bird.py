@@ -102,3 +102,5 @@ def main():
 	pygame.quit()
 	quit()
 main()
+
+#this will print the bird, still in developing stage
