@@ -6,7 +6,7 @@ import time
 import random
 
 WIN_HEIGHT = 800
-WIN_WIDTH = 600
+WIN_WIDTH = 500
 
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird1.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird2.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird3.png")))]
 PIPE_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "pipe.png")))
@@ -38,7 +38,7 @@ class Bird:
 	def move(self):
 		self.tick_count += 1 
 
-		d = self.vel*self.tick_count + 1.5*tick_count**2
+		d = self.vel*self.tick_count + 1.5*self.tick_count**2
 
 		if d >= 16:
 			d = 16
@@ -48,9 +48,9 @@ class Bird:
 
 		self.y = self.y + d
 
-		if d < 0 or self.y1 < self.height + 50:
+		if d < 0 or self.y < self.height + 50:
 			if self.tilt < self.MAX_ROTATION:
-				self.tilt = sellf.MAX_ROTATION
+				self.tilt = self.MAX_ROTATION
 		else:
 			if self.tilt > -90:
 				self.tilt -= self.ROT_VEL
@@ -91,16 +91,18 @@ def main():
 
 	bird = Bird(200, 200)
 	win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-
+	clock = pygame.time.Clock()
 	run = True
 	while run:
+		clock.tick(30)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				run =False
+				run = False
+
+		bird.move()
 		draw_window(win, bird)
 
 	pygame.quit()
 	quit()
 main()
-
 #this will print the bird, still in developing stage
