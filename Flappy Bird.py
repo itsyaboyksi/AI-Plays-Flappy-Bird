@@ -91,10 +91,10 @@ def main():
 
 	bird = Bird(200, 200)
 	win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-	clock = pygame.time.Clock()
+	clock = pygame.time.Clock() #it will help us to not make the bird fall down directly
 	run = True
 	while run:
-		clock.tick(30)
+		clock.tick(30)#this will make the while loop wait for 30 milliseconds before iterating over and over
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				run = False
