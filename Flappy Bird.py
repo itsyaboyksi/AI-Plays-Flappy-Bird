@@ -4,6 +4,7 @@ import pygame
 import neat
 import time
 import random
+pygame.font.init()
 
 WIN_HEIGHT = 800
 WIN_WIDTH = 500
@@ -13,6 +14,7 @@ PIPE_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "pipe
 BASE_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "base.png")))
 BG_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png")))
 
+STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 class Bird:
 	IMGS = BIRD_IMGS
@@ -79,8 +81,8 @@ class Bird:
 		
 		win.blit(rotated_image, new_rect.topleft)
 
-		def get_mask(self):
-			return pygame.mask.from_surface(self.img)
+	def get_mask(self):
+		return pygame.mask.from_surface(self.img)
 
 class Pipe:
 	GAP = 200
@@ -111,13 +113,13 @@ class Pipe:
 		win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
 		pygame.display.update()
 
-	def collide(self, win):
+	def collide(self, bird):
 		bird_mask = bird.get_mask()
 		top_mask = pygame.mask.from_surface(self.PIPE_TOP)
 		bottom_mask = pygame.mask.from_surface(self.PIPE_BOTTOM)
 
-		top_offset = (self.x - bird.x, self.top - round(self.y))
-		bottom_offset = (self.x - bird.x, self.bottom - round(self.y))
+		top_offset = (self.x - bird.x, self.top - round(bird.y))
+		bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
 
 		b_point = bird_mask.overlap(bottom_mask, bottom_offset)
 		t_point = bird_mask.overlap(top_mask, top_offset)
@@ -150,36 +152,64 @@ class Base:
 		win.blit(self.IMG, (self.x1,self.y))
 		win.blit(self.IMG, (self.x2,self.y))
 
-def draw_window(win, bird, pipes, base):
+def draw_window(win, bird, pipes, base, score):
 	win.blit(BG_IMG, (0, 0))
 	
 	for pipe in pipes:
 		pipe.draw(win)
 
+	text = STAT_FONT.render("Score: " + str(score), 1, (255,255,255))
+	win.blit(text, (bird.y, 10))
+		
 	base.draw(win)
 	
 	bird.draw(win)
 	pygame.display.update()
 
 def main():
-	
+
 	bird = Bird(230, 350)
 	base = Base(730)
-	pipes =  
-	
+	pipes = [Pipe(600)]
+	win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 	clock = pygame.time.Clock() #it will help us to not make the bird fall down directly
 	run = True
+	score = 0
+
 	while run:
 		clock.tick(30)#this will make the while loop wait for 30 milliseconds before iterating over and over
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				run = False
+		
+		add_pipe = False
+		rem = []
+		
+		for pipe in pipes:
+			if pipe.collide(bird):
+				pass
 
-		bird.move()
-		draw_window(win, bird)
+			if pipe.x + pipe.PIPE_TOP.get_width() < 0:
+				rem.append(pipe)
+			
+			if not pipe.passed and pipe.x < bird.x:
+				pipe.passed = True
+				add_pipe = True 
+
+			pipe.move()
+
+		if add_pipe:
+			pipes.append(Pipe(600))		
+			score += 1
+
+		for r in rem:
+			pipes.remove(r)
+
+		#bird.move()
+		base.move()
+		draw_window(win, bird, pipes, base, score)
 
 	pygame.quit()
 	quit()
 main()
-
-#this will print the bird, still in developing stage
+#this will print the bird and loop around random pipes, and base, still in developing stage
